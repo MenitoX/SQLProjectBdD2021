@@ -1,3 +1,3 @@
-@mySQLProjectPrototipe
+@SQLProjectPrototipe
 
 Prototipo proyecto
