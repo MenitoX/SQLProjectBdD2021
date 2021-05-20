@@ -1,4 +1,10 @@
 {
     "python.pythonPath": "venv\\Scripts\\python.exe",
-    "python.analysis.extraPaths": ["src\\components\\casosComunas", "src\\modules", "src\\components\\templates"]
+    "python.analysis.extraPaths": 
+        [   
+            "src\\components\\casosComunas", 
+            "src\\modules", 
+            "src\\components\\templates",
+            "src\\models"
+        ]
 }
