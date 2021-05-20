@@ -1,2 +1,4 @@
 /venv
 .env
+/src/modules/__pycache__
+/src/components/casosComunas/__pycache__
