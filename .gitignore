@@ -2,3 +2,4 @@
 .env
 /src/modules/__pycache__
 /src/components/casosComunas/__pycache__
+/src/components/casosRegiones/__pycache__
