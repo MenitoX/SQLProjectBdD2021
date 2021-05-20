@@ -1,6 +1,6 @@
 class CasoComuna:
-  codigo : str
   nombre : str
+  codigo : str
   poblacion : int
   casos  : int 
   def __init__(self, nombre = None, codigo = None, poblacion = None, casos = None):
