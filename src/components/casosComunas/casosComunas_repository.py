@@ -19,6 +19,7 @@ def init(cursor):
     return
 
 def get(id : str, cursor):
+    casoComuna : CasoComuna = None
     cursor.execute(
         """
             SELECT *

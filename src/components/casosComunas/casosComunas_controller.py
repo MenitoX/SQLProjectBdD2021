@@ -12,7 +12,7 @@ def init(connection):
             if firstLine:
                 firstLine = False
                 continue
-            NOMBRE, CODIGO, POBLACION, CASOS = i.split(",")
+            NOMBRE, CODIGO, POBLACION, CASOS = i.strip("\n").split(",")
             casoComuna = CasoComuna(NOMBRE, CODIGO, POBLACION, CASOS)
             repository.post(casoComuna, cursor)
     except Exception as error:
