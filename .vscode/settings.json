@@ -3,8 +3,10 @@
     "python.analysis.extraPaths": 
         [   
             "src\\components\\casosComunas", 
+            "src\\components\\casosRegiones",
             "src\\modules", 
             "src\\components\\templates",
-            "src\\models"
+            "src\\models",
+            "src\\middleware"
         ]
 }
