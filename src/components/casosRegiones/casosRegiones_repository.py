@@ -93,7 +93,7 @@ def patch(id : str, casoRegion : CasoRegion, cursor):
 def trigger(cursor):
     cursor.execute(
         """
-        CREATE OR REPLACE TRIGGER regiones_triggerplus
+        CREATE OR REPLACE TRIGGER regiones_trigger_comunas
         AFTER UPDATE 
         ON CASOS_POR_COMUNA
         FOR EACH ROW
@@ -106,7 +106,7 @@ def trigger(cursor):
                 CASOS_CONFIRMADOS = CASOS_CONFIRMADOS + :new.CASOS_CONFIRMADOS - :old.CASOS_CONFIRMADOS,
                 CODIGO_DE_REGION = CASE WHEN ((POBLACION + :new.POBLACION - :old.POBLACION) /  (CASOS_CONFIRMADOS + :new.CASOS_CONFIRMADOS - :old.CASOS_CONFIRMADOS)) > 0.15 then v_erase else CODIGO_DE_REGION end
             WHERE INSTR(CODIGOS_COMUNAS, ','||:new.CODIGO_DE_COMUNA||',') > 0;
-        END regiones_triggerplus;
+        END regiones_trigger_comunas;
         """
     )
     return

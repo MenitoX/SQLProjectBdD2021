@@ -36,6 +36,11 @@ def init(connection):
                     newPoblacion = casoComuna.poblacion + casoRegion.poblacion
                     newCodigos = casoRegion.codigosComunas + CODIGO_COMUNA + ','  
                     patch(CODIGO_REGION, [None, None, newPoblacion, newCasos, newCodigos], connection)
+        # Check de positividad post-inicialización
+        casosRegiones = getAll(connection)
+        for i in casosRegiones:
+            if i.casos/i.poblacion > 0.15:
+                patch(i.codigo, [None, "ERASE ME", None, None, None], connection)
     except Exception as error:
         print("No se pudo inicializar CASOS_POR_REGION en base al csv: ", error)
     else:
