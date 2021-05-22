@@ -5,8 +5,10 @@ def init(connection):
     cursor = connection.cursor()
     # For dev, comment if initialized
     repository.init(cursor)
+    # View initialization
+    viewComuna(connection)
     try:
-        file = open("src\\templates\\CasosConfirmadosPorComuna.csv", "r")
+        file = open("src\\templates\\CasosConfirmadosPorComuna.csv", "r", encoding='utf-8')
         firstLine = True
         for i in file:
             if firstLine:
@@ -25,19 +27,31 @@ def init(connection):
         cursor.close()
         return
 
-def get(id : str, connection):
+def getById(id : str, connection):
     cursor = connection.cursor()
     casoComuna : CasoComuna = None
     try:
-        casoComuna = repository.get(id, cursor)
+        casoComuna = repository.getById(id, cursor)
     except Exception as error:
         print("Error GET a CASOS_POR_COMUNA: ", error)
-        return 
     else:
         print("GET exitoso a CASOS_POR_COMUNA")
     finally:
         cursor.close()
         return casoComuna
+
+def getAll(connection):
+    cursor  = connection.cursor()
+    rList = None
+    try:
+        rList = repository.getAll(cursor)
+    except Exception as error:
+        print("Error al recuperar los datos de CASOS_POR_COMUNA: ", error)
+    else:
+        print("Consulta de casos en CASOS_POR_COMUNA realizada con éxito")
+    finally:
+        cursor.close()
+        return rList
 
 def post(casoComuna : CasoComuna, connection):
     cursor = connection.cursor()
@@ -78,3 +92,29 @@ def patch(id :str, casoComuna : list(), connection):
     finally:
         cursor.close()
         return
+
+def viewComuna(connection):
+    cursor  = connection.cursor()
+    try:
+        repository.viewComuna(cursor)
+    except Exception as error:
+        print("Error al crear la view de CASOS_POR_COMUNA: ", error)
+    else:
+        print("Creación de view exitosa para CASOS_POR_COMUNA")
+        connection.commit()
+    finally:
+        cursor.close()
+        return
+
+def getView(connection):
+    cursor  = connection.cursor()
+    rList = None
+    try:
+        rList = repository.getView(cursor)
+    except Exception as error:
+        print("Error de GET a la view de CASOS_POR_COMUNA: ", error)
+    else:
+        print("GET de view exitosa para CASOS_POR_COMUNA")
+    finally:
+        cursor.close()
+        return rList

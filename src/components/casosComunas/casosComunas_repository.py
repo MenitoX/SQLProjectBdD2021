@@ -7,18 +7,18 @@ def init(cursor):
     cursor.execute (
         """
             CREATE TABLE CASOS_POR_COMUNA(
-                COMUNA VARCHAR2(50) NOT NULL,
-                CODIGO_DE_COMUNA VARCHAR2(50) NOT NULL,
-                POBLACION NUMBER NOT NULL,
-                CASOS_CONFIRMADOS NUMBER NOT NULL,
-                PRIMARY KEY(CODIGO_DE_COMUNA)
+                COMUNA NVARCHAR2(150) NOT NULL,
+                CODIGO_DE_COMUNA NVARCHAR2(50) NOT NULL,
+                POBLACION NUMBER(38,0) NOT NULL,
+                CASOS_CONFIRMADOS NUMBER(38,0) NOT NULL,
+                CONSTRAINT PK_COMUNA PRIMARY KEY (CODIGO_DE_COMUNA, COMUNA)
             )
         """
     )
     print("Creada primera instancia de CASOS_POR_COMUNA")
     return
 
-def get(id : str, cursor):
+def getById(id : str, cursor):
     casoComuna : CasoComuna = None
     cursor.execute(
         """
@@ -31,6 +31,20 @@ def get(id : str, cursor):
     for COMUNA, CODIGO_DE_COMUNA, POBLACION, CASOS_CONFIRMADOS in cursor:
         casoComuna = CasoComuna(COMUNA, CODIGO_DE_COMUNA, POBLACION, CASOS_CONFIRMADOS)
     return casoComuna
+
+def getAll(cursor):
+    casoComuna : CasoComuna = None
+    cursor.execute(
+        """
+            SELECT *
+            FROM CASOS_POR_COMUNA
+        """
+        )
+    rList = list()
+    for COMUNA, CODIGO_DE_COMUNA, POBLACION, CASOS_CONFIRMADOS in cursor:
+        casoComuna = CasoComuna(COMUNA, CODIGO_DE_COMUNA, POBLACION, CASOS_CONFIRMADOS)
+        rList.append(casoComuna)
+    return rList
 
 def post(casoComuna : CasoComuna, cursor):
     cursor.execute (
@@ -68,3 +82,24 @@ def patch(id : str, casoComuna : CasoComuna, cursor):
         ,(casoComuna.nombre, casoComuna.poblacion, casoComuna.codigo, casoComuna.casos, id)
     )
     return
+
+def viewComuna(cursor):
+    cursor.execute(
+        """
+        CREATE OR REPLACE VIEW VIEW_COMUNA AS
+            SELECT COMUNA, CASOS_CONFIRMADOS FROM CASOS_POR_COMUNA
+        """
+    )
+    return
+
+def getView(cursor):
+    cursor.execute(
+        """
+        SELECT * FROM VIEW_COMUNA
+        """
+    )
+    rList = [[],[]]
+    for i,j in cursor:
+        rList[0].append(i)
+        rList[1].append(j)
+    return rList

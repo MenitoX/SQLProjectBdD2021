@@ -3,7 +3,8 @@ class CasoRegion:
     codigo: str
     casos: int
     poblacion : int
-    def __init__(self, nombre = None, codigo = None, poblacion = None, casos = None):
+    codigosComunas : str
+    def __init__(self, nombre = None, codigo = None, poblacion = None, casos = None, codigosComunas = None):
         self.nombre = nombre
         self.codigo = codigo
         if casos:
@@ -14,5 +15,7 @@ class CasoRegion:
         if poblacion:
             self.poblacion = int(poblacion)
         else:
-            self.poblacion = poblacion 
+            self.poblacion = poblacion
+
+        self.codigosComunas = codigosComunas 
 

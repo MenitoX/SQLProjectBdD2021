@@ -9,8 +9,11 @@ def init(connection):
     cursor = connection.cursor()
     # For dev, comment if initialized
     repository.init(cursor)
+    # Trigger and View initialization
+    trigger(connection)
+    viewRegion(connection)
     try:
-        file = open("src\\templates\\RegionesComunas.csv", "r")
+        file = open("src\\templates\\RegionesComunas.csv", "r", encoding='utf-8')
         firstLine = True
         Regiones = list()
         for i in file:
@@ -19,18 +22,20 @@ def init(connection):
                 continue
             NOMBRE, CODIGO_REGION, CODIGO_COMUNA  = i.strip("\n").split(",")
             if NOMBRE not in Regiones:
-                casoComuna : CasoComuna = controllerComunas.get(CODIGO_COMUNA, connection)
+                casoComuna : CasoComuna = controllerComunas.getById(CODIGO_COMUNA, connection)
                 if casoComuna:
-                    casoRegion = CasoRegion(NOMBRE, CODIGO_REGION, casoComuna.poblacion, casoComuna.casos)
+                    CODIGO_COMUNA = ',' + CODIGO_COMUNA + ','
+                    casoRegion = CasoRegion(NOMBRE, CODIGO_REGION, casoComuna.poblacion, casoComuna.casos, CODIGO_COMUNA)
                     post(casoRegion, connection)
                 Regiones.append(NOMBRE)
             else:
-                casoRegion : CasoRegion = get(CODIGO_REGION, connection)
-                casoComuna : CasoComuna = controllerComunas.get(CODIGO_COMUNA, connection)
+                casoRegion : CasoRegion = getById(CODIGO_REGION, connection)
+                casoComuna : CasoComuna = controllerComunas.getById(CODIGO_COMUNA, connection)
                 if casoComuna:
                     newCasos = casoComuna.casos + casoRegion.casos
                     newPoblacion = casoComuna.poblacion + casoRegion.poblacion
-                    patch(CODIGO_REGION, [None, None, newPoblacion, newCasos], connection)
+                    newCodigos = casoRegion.codigosComunas + CODIGO_COMUNA + ','  
+                    patch(CODIGO_REGION, [None, None, newPoblacion, newCasos, newCodigos], connection)
     except Exception as error:
         print("No se pudo inicializar CASOS_POR_REGION en base al csv: ", error)
     else:
@@ -41,11 +46,11 @@ def init(connection):
         cursor.close()
         return
 
-def get(id : str, connection):
+def getById(id : str, connection):
     cursor = connection.cursor()
     casoRegion : CasoRegion = None
     try:
-        casoRegion = repository.get(id, cursor)
+        casoRegion = repository.getById(id, cursor)
     except Exception as error:
         print("Error GET a CASOS_POR_REGION: ", error)
         return 
@@ -54,6 +59,19 @@ def get(id : str, connection):
     finally:
         cursor.close()
         return casoRegion
+
+def getAll(connection):
+    cursor  = connection.cursor()
+    rList = None
+    try:
+        rList = repository.getAll(cursor)
+    except Exception as error:
+        print("Error al recuperar los datos de CASOS_POR_REGION: ", error)
+    else:
+        print("Consulta de casos en CASOS_POR_REGION realizada con éxito")
+    finally:
+        cursor.close()
+        return rList
 
 def post(casoRegion : CasoRegion, connection):
     cursor = connection.cursor()
@@ -67,7 +85,7 @@ def post(casoRegion : CasoRegion, connection):
     finally:
         cursor.close()
         return
-
+    
 def delete(id : str, connection):
     cursor = connection.cursor()
     try:
@@ -83,7 +101,7 @@ def delete(id : str, connection):
 
 def patch(id :str, casoRegion : list(), connection):
     cursor = connection.cursor()
-    casoRegion = CasoRegion(casoRegion[0],casoRegion[1],casoRegion[2],casoRegion[3])
+    casoRegion = CasoRegion(casoRegion[0],casoRegion[1],casoRegion[2],casoRegion[3], casoRegion[4])
     try:
         repository.patch(id, casoRegion, cursor)
     except Exception as error:
@@ -94,3 +112,44 @@ def patch(id :str, casoRegion : list(), connection):
     finally:
         cursor.close()
         return
+
+# Triggers para aumento/decremento dinámico de casos
+# respecto a los cambios en CASOS_POR_COMUNA
+def trigger(connection):
+    cursor  = connection.cursor()
+    try:
+        repository.trigger(cursor)
+    except Exception as error:
+        print("Error al crear los triggers de CASOS_POR_REGION: ", error)
+    else:
+        print("Creación de triggers exitosa para CASOS_POR_REGION")
+        connection.commit()
+    finally:
+        cursor.close()
+        return
+
+def viewRegion(connection):
+    cursor  = connection.cursor()
+    try:
+        repository.viewRegion(cursor)
+    except Exception as error:
+        print("Error al crear la view de CASOS_POR_REGION: ", error)
+    else:
+        print("Creación de view exitosa para CASOS_POR_REGION")
+        connection.commit()
+    finally:
+        cursor.close()
+        return
+
+def getView(connection):
+    cursor  = connection.cursor()
+    rList = None
+    try:
+        rList = repository.getView(cursor)
+    except Exception as error:
+        print("Error al crear la view de CASOS_POR_REGION: ", error)
+    else:
+        print("Creación de view exitosa para CASOS_POR_REGION")
+    finally:
+        cursor.close()
+        return rList
