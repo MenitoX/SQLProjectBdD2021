@@ -90,10 +90,30 @@ def patch(id : str, casoRegion : CasoRegion, cursor):
     )
     return
 
-def trigger(cursor):
+# Trigger para actualizar la región donde se insertó la comuna
+def triggerInsertComunas(cursor):
     cursor.execute(
         """
-        CREATE OR REPLACE TRIGGER regiones_trigger_comunas
+        CREATE OR REPLACE TRIGGER regiones_trigger_insert_comunas
+        AFTER INSERT 
+        ON CASOS_POR_COMUNA
+        FOR EACH ROW
+        BEGIN 
+            UPDATE CASOS_POR_REGION
+            SET
+                POBLACION = POBLACION + :new.POBLACION,
+                CASOS_CONFIRMADOS = CASOS_CONFIRMADOS + :new.CASOS_CONFIRMADOS
+            WHERE INSTR(CODIGOS_COMUNAS, ','||:new.CODIGO_DE_COMUNA||',') > 0;
+        END regiones_trigger_insert_comunas;
+        """
+    )
+    return
+
+# Trigger para actualizar la región donde se actualizó una comuna
+def triggerUpdateComunas(cursor):
+    cursor.execute(
+        """
+        CREATE OR REPLACE TRIGGER regiones_trigger_update_comunas
         AFTER UPDATE 
         ON CASOS_POR_COMUNA
         FOR EACH ROW
@@ -106,7 +126,27 @@ def trigger(cursor):
                 CASOS_CONFIRMADOS = CASOS_CONFIRMADOS + :new.CASOS_CONFIRMADOS - :old.CASOS_CONFIRMADOS,
                 CODIGO_DE_REGION = CASE WHEN ((POBLACION + :new.POBLACION - :old.POBLACION) /  (CASOS_CONFIRMADOS + :new.CASOS_CONFIRMADOS - :old.CASOS_CONFIRMADOS)) > 0.15 then v_erase else CODIGO_DE_REGION end
             WHERE INSTR(CODIGOS_COMUNAS, ','||:new.CODIGO_DE_COMUNA||',') > 0;
-        END regiones_trigger_comunas;
+        END regiones_trigger_update_comunas;
+        """
+    )
+    return
+
+# Borra poblacion, casos y codigo de la región donde se borro una comuna
+def triggerDeleteComunas(cursor):
+    cursor.execute(
+        """
+        CREATE OR REPLACE TRIGGER regiones_trigger_delete_comunas
+        AFTER DELETE 
+        ON CASOS_POR_COMUNA
+        FOR EACH ROW
+        BEGIN 
+            UPDATE CASOS_POR_REGION
+            SET
+                POBLACION = POBLACION - :old.POBLACION,
+                CASOS_CONFIRMADOS = CASOS_CONFIRMADOS - :old.CASOS_CONFIRMADOS,
+                CODIGOS_COMUNAS = REPLACE(CODIGOS_COMUNAS,:old.CODIGO_DE_COMUNA||',','')  
+            WHERE INSTR(CODIGOS_COMUNAS, ','||:old.CODIGO_DE_COMUNA||',') > 0;
+        END regiones_trigger_delete_comunas;
         """
     )
     return

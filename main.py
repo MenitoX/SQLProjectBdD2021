@@ -20,7 +20,8 @@ if __name__ == '__main__':
     #casosComunas_controller.patch("15101", [None, None,"5000" ,None], connection)
     #mw.addCasos(connection)
     #mw.crearComuna(connection)
-    mw.checkErase(connection)
+    
+    mw.crearRegion(connection)
     #mw.checkTopRegiones(connection)
     #mw.checkTopComunas(connection)
     oracle_module.disconnect(connection)

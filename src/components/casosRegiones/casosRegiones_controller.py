@@ -118,12 +118,13 @@ def patch(id :str, casoRegion : list(), connection):
         cursor.close()
         return
 
-# Triggers para aumento/decremento dinámico de casos
-# respecto a los cambios en CASOS_POR_COMUNA
+# Setea los triggers declarados
 def trigger(connection):
     cursor  = connection.cursor()
     try:
-        repository.trigger(cursor)
+        repository.triggerInsertComunas(cursor)
+        repository.triggerUpdateComunas(cursor)
+        repository.triggerDeleteComunas(cursor)
     except Exception as error:
         print("Error al crear los triggers de CASOS_POR_REGION: ", error)
     else:
