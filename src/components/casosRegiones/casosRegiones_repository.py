@@ -124,7 +124,7 @@ def triggerUpdateComunas(cursor):
             SET
                 POBLACION = POBLACION + :new.POBLACION - :old.POBLACION,
                 CASOS_CONFIRMADOS = CASOS_CONFIRMADOS + :new.CASOS_CONFIRMADOS - :old.CASOS_CONFIRMADOS,
-                CODIGO_DE_REGION = CASE WHEN ((POBLACION + :new.POBLACION - :old.POBLACION) /  (CASOS_CONFIRMADOS + :new.CASOS_CONFIRMADOS - :old.CASOS_CONFIRMADOS)) > 0.15 then v_erase else CODIGO_DE_REGION end
+                CODIGO_DE_REGION = CASE WHEN ((CASOS_CONFIRMADOS + :new.CASOS_CONFIRMADOS - :old.CASOS_CONFIRMADOS) / (POBLACION + :new.POBLACION - :old.POBLACION)) > 0.15 then v_erase else CODIGO_DE_REGION end
             WHERE INSTR(CODIGOS_COMUNAS, ','||:new.CODIGO_DE_COMUNA||',') > 0;
         END regiones_trigger_update_comunas;
         """

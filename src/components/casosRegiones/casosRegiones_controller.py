@@ -5,10 +5,11 @@ from casosRegiones_model import CasoRegion
 
 #REGION, CODIGO REGION, POBLACION, CASOS 
 
-def init(connection):
+def init(connection, DEBUG = False):
     cursor = connection.cursor()
     # For dev, comment if initialized
-    initAux(cursor)
+    if initAux(cursor):
+        return
     # Trigger and View initialization
     trigger(connection)
     viewRegion(connection)
@@ -22,148 +23,171 @@ def init(connection):
                 continue
             NOMBRE, CODIGO_REGION, CODIGO_COMUNA  = i.strip("\n").split(",")
             if NOMBRE not in Regiones:
-                casoComuna : CasoComuna = controllerComunas.getById(CODIGO_COMUNA, connection)
+                casoComuna : CasoComuna = controllerComunas.getById(CODIGO_COMUNA, connection, DEBUG)
                 if casoComuna:
                     CODIGO_COMUNA = ',' + CODIGO_COMUNA + ','
                     casoRegion = CasoRegion(NOMBRE, CODIGO_REGION, casoComuna.poblacion, casoComuna.casos, CODIGO_COMUNA)
                     post(casoRegion, connection)
                 Regiones.append(NOMBRE)
             else:
-                casoRegion : CasoRegion = getById(CODIGO_REGION, connection)
-                casoComuna : CasoComuna = controllerComunas.getById(CODIGO_COMUNA, connection)
+                casoRegion : CasoRegion = getById(CODIGO_REGION, connection, DEBUG)
+                casoComuna : CasoComuna = controllerComunas.getById(CODIGO_COMUNA, connection, DEBUG)
                 if casoComuna:
                     newCasos = casoComuna.casos + casoRegion.casos
                     newPoblacion = casoComuna.poblacion + casoRegion.poblacion
                     newCodigos = casoRegion.codigosComunas + CODIGO_COMUNA + ','  
-                    patch(CODIGO_REGION, [None, None, newPoblacion, newCasos, newCodigos], connection)
+                    patch(CODIGO_REGION, [None, None, newPoblacion, newCasos, newCodigos], connection, DEBUG)
         # Check de positividad post-inicialización
         casosRegiones = getAll(connection)
         for i in casosRegiones:
             if i.casos/i.poblacion > 0.15:
-                patch(i.codigo, [None, "ERASE ME", None, None, None], connection)
+                patch(i.codigo, [None, "ERASE ME", None, None, None], connection, DEBUG)
     except Exception as error:
-        print("No se pudo inicializar CASOS_POR_REGION en base al csv: ", error)
+        if DEBUG:
+            print("No se pudo inicializar CASOS_POR_REGION en base al csv: ", error)
     else:
-        print("Primera inicializacion de CASOS_POR_REGION finalizada en base a archivo csv")
+        if DEBUG:
+            print("Primera inicializacion de CASOS_POR_REGION finalizada en base a archivo csv")
         connection.commit()
     finally:
         file.close()
         cursor.close()
         return
 
-def initAux(cursor):
+def initAux(cursor, DEBUG = False):
     try:
         repository.init(cursor)
     except Exception as error:
-        print("No se pudo crear la tabla CASOS_POR_REGION : ", error)
+        if DEBUG:
+            print("No se pudo crear la tabla CASOS_POR_REGION : ", error)
+        bool = True
+    else:
+        if DEBUG:
+            print("Creada tabla CASOS_POR_REGION")
+        bool = False
     finally:
-        return
+        return bool
 
-def getById(id : str, connection):
+def getById(id : str, connection, DEBUG = False):
     cursor = connection.cursor()
     casoRegion : CasoRegion = None
     try:
         casoRegion = repository.getById(id, cursor)
     except Exception as error:
-        print("Error GET a CASOS_POR_REGION: ", error)
-        return 
+        if DEBUG:
+            print("Error GET a CASOS_POR_REGION: ", error)
     else:
-        print("GET exitoso a CASOS_POR_REGION")
+        if DEBUG:
+            print("GET exitoso a CASOS_POR_REGION")
     finally:
         cursor.close()
         return casoRegion
 
-def getAll(connection):
+def getAll(connection, DEBUG = False):
     cursor  = connection.cursor()
     rList = None
     try:
         rList = repository.getAll(cursor)
     except Exception as error:
-        print("Error al recuperar los datos de CASOS_POR_REGION: ", error)
+        if DEBUG:
+            print("Error al recuperar los datos de CASOS_POR_REGION: ", error)
     else:
-        print("Consulta de casos en CASOS_POR_REGION realizada con éxito")
+        if DEBUG:
+            print("Consulta de casos en CASOS_POR_REGION realizada con éxito")
     finally:
         cursor.close()
         return rList
 
-def post(casoRegion : CasoRegion, connection):
+def post(casoRegion : CasoRegion, connection, DEBUG = False):
     cursor = connection.cursor()
     try:
         repository.post(casoRegion, cursor)
     except Exception as error:
-        print("Error POST a CASOS_POR_REGION: ", error)
+        if DEBUG:
+            print("Error POST a CASOS_POR_REGION: ", error)
     else:
-        print("POST exitoso a CASOS_POR_REGION")
+        if DEBUG:
+            print("POST exitoso a CASOS_POR_REGION")
         connection.commit()
     finally:
         cursor.close()
         return
     
-def delete(id : str, connection):
+def delete(id : str, connection, DEBUG = False):
     cursor = connection.cursor()
     try:
         repository.delete(id, cursor)
     except Exception as error:
-        print("Error DELETE a CASOS_POR_REGION: ", error)
+        if DEBUG:
+            print("Error DELETE a CASOS_POR_REGION: ", error)
     else:
-        print("DELETE exitoso a CASOS_POR_REGION")
+        if DEBUG:
+            print("DELETE exitoso a CASOS_POR_REGION")
         connection.commit()
     finally:
         cursor.close()
         return
 
-def patch(id :str, casoRegion : list(), connection):
+def patch(id :str, casoRegion : list(), connection, DEBUG = False):
     cursor = connection.cursor()
     casoRegion = CasoRegion(casoRegion[0],casoRegion[1],casoRegion[2],casoRegion[3], casoRegion[4])
     try:
         repository.patch(id, casoRegion, cursor)
     except Exception as error:
-        print("Error PATCH a CASOS_POR_REGION: ", error)
+        if DEBUG:
+            print("Error PATCH a CASOS_POR_REGION: ", error)
     else:
-        print("PATCH exitoso a CASOS_POR_REGION")
+        if DEBUG:
+            print("PATCH exitoso a CASOS_POR_REGION")
         connection.commit()
     finally:
         cursor.close()
         return
 
 # Setea los triggers declarados
-def trigger(connection):
+def trigger(connection, DEBUG = False):
     cursor  = connection.cursor()
     try:
         repository.triggerInsertComunas(cursor)
         repository.triggerUpdateComunas(cursor)
         repository.triggerDeleteComunas(cursor)
     except Exception as error:
-        print("Error al crear los triggers de CASOS_POR_REGION: ", error)
+        if DEBUG:
+            print("Error al crear los triggers de CASOS_POR_REGION: ", error)
     else:
-        print("Creación de triggers exitosa para CASOS_POR_REGION")
+        if DEBUG:
+            print("Creación de triggers exitosa para CASOS_POR_REGION")
         connection.commit()
     finally:
         cursor.close()
         return
 
-def viewRegion(connection):
+def viewRegion(connection, DEBUG = False):
     cursor  = connection.cursor()
     try:
         repository.viewRegion(cursor)
     except Exception as error:
-        print("Error al crear la view de CASOS_POR_REGION: ", error)
+        if DEBUG:
+            print("Error al crear la view de CASOS_POR_REGION: ", error)
     else:
-        print("Creación de view exitosa para CASOS_POR_REGION")
+        if DEBUG:
+            print("Creación de view exitosa para CASOS_POR_REGION")
         connection.commit()
     finally:
         cursor.close()
         return
 
-def getView(connection):
+def getView(connection, DEBUG = False):
     cursor  = connection.cursor()
     rList = None
     try:
         rList = repository.getView(cursor)
     except Exception as error:
-        print("Error al crear la view de CASOS_POR_REGION: ", error)
+        if DEBUG:
+            print("Error al crear la view de CASOS_POR_REGION: ", error)
     else:
-        print("Creación de view exitosa para CASOS_POR_REGION")
+        if DEBUG:
+            print("Creación de view exitosa para CASOS_POR_REGION")
     finally:
         cursor.close()
         return rList
