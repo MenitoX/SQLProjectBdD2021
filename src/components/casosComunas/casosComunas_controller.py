@@ -4,7 +4,7 @@ from casosComunas_model import CasoComuna
 def init(connection):
     cursor = connection.cursor()
     # For dev, comment if initialized
-    repository.init(cursor)
+    initAux(cursor)
     # View initialization
     viewComuna(connection)
     try:
@@ -25,6 +25,14 @@ def init(connection):
     finally:
         file.close()
         cursor.close()
+        return
+
+def initAux(cursor):
+    try:
+        repository.init(cursor)
+    except Exception as error:
+        print("No se pudo crear la tabla CASOS_POR_COMUNA : ", error)
+    finally:
         return
 
 def getById(id : str, connection):

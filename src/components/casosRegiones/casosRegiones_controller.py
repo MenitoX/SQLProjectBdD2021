@@ -8,7 +8,7 @@ from casosRegiones_model import CasoRegion
 def init(connection):
     cursor = connection.cursor()
     # For dev, comment if initialized
-    repository.init(cursor)
+    initAux(cursor)
     # Trigger and View initialization
     trigger(connection)
     viewRegion(connection)
@@ -49,6 +49,14 @@ def init(connection):
     finally:
         file.close()
         cursor.close()
+        return
+
+def initAux(cursor):
+    try:
+        repository.init(cursor)
+    except Exception as error:
+        print("No se pudo crear la tabla CASOS_POR_REGION : ", error)
+    finally:
         return
 
 def getById(id : str, connection):

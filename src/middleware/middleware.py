@@ -246,7 +246,12 @@ def fusionComunas(connection):
     regionesPadres.sort()
     codigoFusion = comuna1.codigo+'-'+comuna2.codigo
     codigoRegion1 = regionesPadres[0][1]
-    codigoRegion2 = regionesPadres[1][1]
+    
+    # Para que funcione si solo existe una región
+    if len(regionesPadres) > 1:
+        codigoRegion2 = regionesPadres[1][1]
+    else:
+        codigoRegion2 = codigoRegion1
 
     # Caso distintas regiones
     if codigoRegion1 != codigoRegion2:
@@ -269,12 +274,13 @@ def fusionComunas(connection):
     else:
         codigoRegion = regionesPadres[0][1]
         codigosComunas = regionesPadres[0][2]
-        nuevoCodigosComunas = codigosComunas.replace(comuna1.codigo, codigoFusion)
+        nuevoCodigosComunas = codigosComunas.replace(comuna2.codigo+',', "")
+        nuevoCodigosComunas = nuevoCodigosComunas.replace(comuna1.codigo, codigoFusion)
         controllerRegiones.patch(codigoRegion, [None, None, None, None, nuevoCodigosComunas], connection)
     
     # Post de la fusión
     fusionPoblacion = comuna1.poblacion + comuna2.poblacion
-    fusionCasos = comuna1.casos + comuna2.poblacion
+    fusionCasos = comuna1.casos + comuna2.casos
     casoComuna = CasoComuna(nombre, codigoFusion, fusionPoblacion, fusionCasos)
     controllerComunas.post(casoComuna, connection)
     return
