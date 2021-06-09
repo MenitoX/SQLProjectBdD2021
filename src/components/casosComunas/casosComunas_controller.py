@@ -4,7 +4,7 @@ from casosComunas_model import CasoComuna
 def init(connection, DEBUG = False):
     cursor = connection.cursor()
     # For dev, comment if initialized
-    if initAux(cursor):
+    if initAux(cursor, DEBUG):
         return
     # View initialization
     viewComuna(connection)

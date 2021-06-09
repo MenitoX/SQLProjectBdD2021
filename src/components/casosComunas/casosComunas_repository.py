@@ -15,7 +15,6 @@ def init(cursor):
             )
         """
     )
-    print("Creada primera instancia de CASOS_POR_COMUNA")
     return
 
 def getById(id : str, cursor):
@@ -87,7 +86,7 @@ def viewComuna(cursor):
     cursor.execute(
         """
         CREATE OR REPLACE VIEW VIEW_COMUNA AS
-            SELECT COMUNA, CASOS_CONFIRMADOS FROM CASOS_POR_COMUNA
+            SELECT COMUNA, CASOS_CONFIRMADOS, CODIGO_DE_COMUNA FROM CASOS_POR_COMUNA
         """
     )
     return
@@ -99,7 +98,7 @@ def getView(cursor):
         """
     )
     rList = [[],[]]
-    for i,j in cursor:
-        rList[0].append(i)
+    for i,j,z in cursor:
+        rList[0].append(i+"("+z+")")
         rList[1].append(j)
     return rList

@@ -8,7 +8,7 @@ from casosRegiones_model import CasoRegion
 def init(connection, DEBUG = False):
     cursor = connection.cursor()
     # For dev, comment if initialized
-    if initAux(cursor):
+    if initAux(cursor, DEBUG):
         return
     # Trigger and View initialization
     trigger(connection)
