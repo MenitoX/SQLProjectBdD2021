@@ -4,6 +4,7 @@ DEV: Pablo Contreras
 ROL: 201973572-1
 
 Este proyecto se divide en 5 capas:
+    
     Components:
         Capa de componentes, cuentan con un repositorio que contiene las funciones relacionadas
         a la comunicación con SQL y un controlador que implementa esta funciones en métodos más externos.
