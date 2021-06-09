@@ -13,6 +13,7 @@ import casosRegiones_controller as controllerRegiones
 def init(connection, DEBUG = False):
     controllerComunas.init(connection, DEBUG)
     controllerRegiones.init(connection, DEBUG)
+    return
 
 # Postea una comuna a la base de datos
 def crearComuna(connection, DEBUG = False):
@@ -97,6 +98,8 @@ def addCasos(connection, DEBUG = False):
         print("[ERROR] Esa comuna no existe!")
         return
     nCasos = casoComuna.casos + casos
+    if nCasos > casoComuna.poblacion:
+        nCasos = casoComuna.poblacion
     casoComuna = [None, None, None, nCasos]
     controllerComunas.patch(id, casoComuna, connection, DEBUG)
     return
