@@ -8,7 +8,7 @@ import casosRegiones_controller
 
 def main():
     # Debug Bool | True -> Info de DEBUG , False -> Ejecución normal
-    __DEBUG__ = True
+    __DEBUG__ = False
     text = "1. Crear comuna\n2. Crear región\n3. Ver casos de comunas\n4. Ver casos de regiones\n5. Sumar casos\n6. Restar casos\n7. Top casos comunas\n8. Top casos regiones\n9. Fusionar regiones\n10. Fusionar comunas\nexit. Salir\n\nInput: "
     oracle_module = importlib.import_module('.oracle_module', package='modules')
     mw = importlib.import_module('.middleware', package='middleware')

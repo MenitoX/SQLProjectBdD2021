@@ -27,7 +27,7 @@ Se necesita un archivo .env con los atributos USER, PASS y URL en root.
 
 El booleano DEGUG en backend.py determina si se hace un display de información de DEBUG respecto a las tablas.
 
-Las librerias utilizadas están listadas en requirements.txt, en cualquier caso si se está en windows, ejecutando init.bat se creará un virutal environment junto a las librerias necesarias para ejecutar el código.
+Las librerias utilizadas están listadas en requirements.txt, en cualquier caso si se está en windows, ejecutando init.bat se creará un virutal environment junto a las librerias necesarias para ejecutar el código (SÓLO CMD).
 
 Consideraciones:
     
