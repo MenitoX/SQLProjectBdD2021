@@ -5,6 +5,7 @@ from casosRegiones_model import CasoRegion
 
 #REGION, CODIGO REGION, POBLACION, CASOS 
 
+# Inicializa la tabla de Regiones. Recibe la conexión a oracle y un bool debug
 def init(connection, DEBUG = False):
     cursor = connection.cursor()
     # For dev, comment if initialized
@@ -54,6 +55,7 @@ def init(connection, DEBUG = False):
         cursor.close()
         return
 
+# Auxiliar de inicialización de la tabla, que la crea. Recibe un cursor y el bool debug
 def initAux(cursor, DEBUG = False):
     try:
         repository.init(cursor)
@@ -68,6 +70,7 @@ def initAux(cursor, DEBUG = False):
     finally:
         return bool
 
+# Busca una región por código de comuna, recibe el código, la conexión a oracle y un bool debug
 def getById(id : str, connection, DEBUG = False):
     cursor = connection.cursor()
     casoRegion : CasoRegion = None
@@ -83,6 +86,7 @@ def getById(id : str, connection, DEBUG = False):
         cursor.close()
         return casoRegion
 
+# Retorna todas las regiones, recibe la conexión a oracle y un bool debug
 def getAll(connection, DEBUG = False):
     cursor  = connection.cursor()
     rList = None
@@ -98,6 +102,7 @@ def getAll(connection, DEBUG = False):
         cursor.close()
         return rList
 
+# Método POST de regiones, recibe una clase CasoRegion, la conexión y un bool debug
 def post(casoRegion : CasoRegion, connection, DEBUG = False):
     cursor = connection.cursor()
     try:
@@ -112,7 +117,8 @@ def post(casoRegion : CasoRegion, connection, DEBUG = False):
     finally:
         cursor.close()
         return
-    
+
+# Método DELETE de regiones, recibe un codigo de comuna, la conexión y un bool debug    
 def delete(id : str, connection, DEBUG = False):
     cursor = connection.cursor()
     try:
@@ -128,6 +134,8 @@ def delete(id : str, connection, DEBUG = False):
         cursor.close()
         return
 
+# Método PATCH de regiones, recibe un codigo de region, una lista con los atributos de CasoRegion,
+# siendo nulos los campos que no se desea actualizar, la conexión y un bool debug
 def patch(id :str, casoRegion : list(), connection, DEBUG = False):
     cursor = connection.cursor()
     casoRegion = CasoRegion(casoRegion[0],casoRegion[1],casoRegion[2],casoRegion[3], casoRegion[4])
@@ -144,7 +152,7 @@ def patch(id :str, casoRegion : list(), connection, DEBUG = False):
         cursor.close()
         return
 
-# Setea los triggers declarados
+# Setea los triggers declarados, recibe la conexión y un bool debug
 def trigger(connection, DEBUG = False):
     cursor  = connection.cursor()
     try:
@@ -162,6 +170,7 @@ def trigger(connection, DEBUG = False):
         cursor.close()
         return
 
+# Crea la view de regiones, recibe la conexión y un bool debug
 def viewRegion(connection, DEBUG = False):
     cursor  = connection.cursor()
     try:
@@ -177,6 +186,7 @@ def viewRegion(connection, DEBUG = False):
         cursor.close()
         return
 
+# Retorna los valores de la view de regiones, recibe la conexión y un bool debug
 def getView(connection, DEBUG = False):
     cursor  = connection.cursor()
     rList = None

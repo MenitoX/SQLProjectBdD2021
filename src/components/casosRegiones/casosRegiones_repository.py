@@ -3,6 +3,9 @@ sys.path.append('src/models')
 
 from casosRegiones_model import CasoRegion
 
+# GENERAL: Implementados por el controlador, solo que en vez de la conexión reciben 
+# el cursor y en vez de listas con nulos, el CasoRegion
+
 def init(cursor):
     cursor.execute (
         """

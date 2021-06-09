@@ -9,7 +9,9 @@ from casosRegiones_model import CasoRegion
 import casosComunas_controller as controllerComunas
 import casosRegiones_controller as controllerRegiones
 
+# GENERAL: Reciben la conexión a oracle y un bool de debug.
 
+# Inicializa las tablas
 def init(connection, DEBUG = False):
     controllerComunas.init(connection, DEBUG)
     controllerRegiones.init(connection, DEBUG)
@@ -182,7 +184,8 @@ def checkTopRegiones(connection, DEBUG = False):
         print(i, j)
     return
 
-# Función para mantener en memoria una lista con los top 5 valores
+# Función para mantener en memoria una lista con los top 5 valores, recibe la lista
+# con casos actuales y el caso a evaluar. Retorna la lista actualizada
 def checkTopAuxiliar(lista : list() , caso : list()):
     lenLista = len(lista)
     if lenLista == 0:

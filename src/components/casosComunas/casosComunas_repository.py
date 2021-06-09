@@ -3,6 +3,9 @@ sys.path.append('src/models')
 
 from casosComunas_model import CasoComuna
 
+# GENERAL: Implementados por el controlador, solo que en vez de la conexión reciben 
+# el cursor y en vez de listas con nulos, el CasoComuna
+
 def init(cursor):
     cursor.execute (
         """

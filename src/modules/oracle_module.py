@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# Realiza la conexión a oracle, retorna la conexión
 def connect():
     USER = os.getenv('USER')
     PASS = os.getenv('PASS')
@@ -18,6 +19,7 @@ def connect():
     finally:
         return connection
 
+# Recibe y desconecta la conexión.
 def disconnect(connection):
     try:
         connection.close()

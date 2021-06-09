@@ -1,6 +1,7 @@
 import casosComunas_repository as repository
 from casosComunas_model import CasoComuna
 
+# Inicializa la tabla de Comunas. Recibe la conexión a oracle y un bool debug
 def init(connection, DEBUG = False):
     cursor = connection.cursor()
     # For dev, comment if initialized
@@ -30,6 +31,7 @@ def init(connection, DEBUG = False):
         cursor.close()
         return
 
+# Auxiliar de inicialización de la tabla, que la crea. Recibe un cursor y el bool debug
 def initAux(cursor, DEBUG = False):
     try:
         repository.init(cursor)
@@ -42,6 +44,7 @@ def initAux(cursor, DEBUG = False):
     finally:
         return bool
 
+# Busca una comuna por código de comuna, recibe el código, la conexión a oracle y un bool debug
 def getById(id : str, connection, DEBUG = False):
     cursor = connection.cursor()
     casoComuna : CasoComuna = None
@@ -57,6 +60,7 @@ def getById(id : str, connection, DEBUG = False):
         cursor.close()
         return casoComuna
 
+# Retorna todas las comunas, recibe la conexión a oracle y un bool debug
 def getAll(connection, DEBUG = False):
     cursor  = connection.cursor()
     rList = None
@@ -72,6 +76,7 @@ def getAll(connection, DEBUG = False):
         cursor.close()
         return rList
 
+# Método POST de comunas, recibe una clase CasoComuna, la conexión y un bool debug
 def post(casoComuna : CasoComuna, connection, DEBUG = False):
     cursor = connection.cursor()
     try:
@@ -87,6 +92,7 @@ def post(casoComuna : CasoComuna, connection, DEBUG = False):
         cursor.close()
         return
 
+# Método DELETE de comunas, recibe un codigo de comuna, la conexión y un bool debug
 def delete(id : str, connection, DEBUG = False):
     cursor = connection.cursor()
     try:
@@ -102,6 +108,8 @@ def delete(id : str, connection, DEBUG = False):
         cursor.close()
         return
 
+# Método PATCH de comunas, recibe un codigo de comuna, una lista con los atributos de CasoComuna,
+# siendo nulos los campos que no se desea actualizar, la conexión y un bool debug
 def patch(id :str, casoComuna : list(), connection, DEBUG = False):
     cursor = connection.cursor()
     casoComuna = CasoComuna(casoComuna[0],casoComuna[1],casoComuna[2],casoComuna[3])
@@ -118,6 +126,7 @@ def patch(id :str, casoComuna : list(), connection, DEBUG = False):
         cursor.close()
         return
 
+# Crea la view de comuna, recibe la conexión y un bool debug
 def viewComuna(connection, DEBUG = False):
     cursor  = connection.cursor()
     try:
@@ -133,6 +142,7 @@ def viewComuna(connection, DEBUG = False):
         cursor.close()
         return
 
+# Retorna los valores de la view de comuna, recibe la conexión y un bool debug
 def getView(connection, DEBUG = False):
     cursor  = connection.cursor()
     rList = None
