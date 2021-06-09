@@ -30,6 +30,7 @@ El booleano DEGUG en backend.py determina si se hace un display de información 
 Las librerias utilizadas están listadas en requirements.txt, en cualquier caso si se está en windows, ejecutando init.bat se creará un virutal environment junto a las librerias necesarias para ejecutar el código.
 
 Consideraciones:
+    
     - No me manejo muy bien con los imports de python y puede ser algo desastroso a ratos, por alguna razón si no importo los controladores al backend.py el código falla.
     
     - Se valida la data de los inputs, pero intentar no introducir información erronea apropósito.
