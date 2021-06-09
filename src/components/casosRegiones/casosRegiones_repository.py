@@ -16,7 +16,6 @@ def init(cursor):
             )
         """
     )
-    print("Creada primera instancia de CASOS_POR_REGION")
     return
 
 def getById(id : str, cursor):
@@ -155,7 +154,7 @@ def viewRegion(cursor):
     cursor.execute(
         """
         CREATE OR REPLACE VIEW VIEW_REGION AS
-            SELECT REGION, CASOS_CONFIRMADOS FROM CASOS_POR_REGION
+            SELECT REGION, CASOS_CONFIRMADOS, CODIGO_DE_REGION FROM CASOS_POR_REGION
         """
     )
     return
@@ -167,7 +166,7 @@ def getView(cursor):
         """
     )
     rList = [[],[]]
-    for i,j in cursor:
-        rList[0].append(i)
+    for i,j,z in cursor:
+        rList[0].append(i+"("+z+")")
         rList[1].append(j)
     return rList

@@ -11,8 +11,8 @@ import casosRegiones_controller as controllerRegiones
 
 
 def init(connection, DEBUG = False):
-    controllerComunas.init(connection)
-    controllerRegiones.init(connection)
+    controllerComunas.init(connection, DEBUG)
+    controllerRegiones.init(connection, DEBUG)
 
 # Postea una comuna a la base de datos
 def crearComuna(connection, DEBUG = False):
@@ -21,6 +21,13 @@ def crearComuna(connection, DEBUG = False):
     CODIGO_REGION = input("Codigo de la región de la comuna : ")
     POBLACION = input("Población de la comuna : ")
     
+    if controllerComunas.getById(CODIGO_COMUNA, connection, DEBUG):
+        print("[ERROR] Codigo de cómuna en uso!")
+        return
+
+    if not controllerRegiones.getById(CODIGO_REGION, connection, DEBUG):
+        print("[ERROR] Esa región no existe!")
+        return
     # PATCH para añadir el código a la región para propio funcionamiento del trigger de updates
     casoRegion = controllerRegiones.getById(CODIGO_REGION, connection, DEBUG)
     newCodigos = casoRegion.codigosComunas + CODIGO_COMUNA + ","
@@ -36,6 +43,9 @@ def crearComuna(connection, DEBUG = False):
 def crearRegion(connection, DEBUG = False):
     REGION = input("Nombre de la region : ")
     CODIGO_REGION = input("Codigo de la región : ")
+    if controllerRegiones.getById(CODIGO_REGION, connection, DEBUG):
+        print("[ERROR] Codigo de región en uso!")
+        return
     casoRegion = CasoRegion(REGION, CODIGO_REGION, 0, 0, ",")
     controllerRegiones.post(casoRegion, connection, DEBUG)
     return
@@ -44,15 +54,17 @@ def crearRegion(connection, DEBUG = False):
 # contiene la comuna y los casos confirmados
 def verCasosComunas(connection, DEBUG = False):
     id = input("Id de la comuna que quiere ver / No responda nada si desea el registro completo : ")
-    print("Comuna | Casos Confirmados")
+    print("   Comuna        |           Casos Confirmados")
     if id != "":
         casosComunas = controllerComunas.getById(id, connection, DEBUG)
+        while len(casosComunas.nombre) < 30:
+                casosComunas.nombre += " "
         print(casosComunas.nombre,"  ",casosComunas.casos)
     else:
         casosComunas = controllerComunas.getView(connection, DEBUG)
         for i in range(len(casosComunas[0])):
-            while len(casosComunas[0][i]) < 25:
-                casosComunas[0][i] = casosComunas[0][i] + " "
+            while len(casosComunas[0][i]) < 30:
+                casosComunas[0][i] += " "
             print(casosComunas[0][i],"  ",casosComunas[1][i])
     return
 
@@ -60,14 +72,17 @@ def verCasosComunas(connection, DEBUG = False):
 # contiene la region y los casos confirmados
 def verCasosRegiones(connection, DEBUG = False):
     id = input("Id de la Region que quiere ver / No responda nada si desea el registro completo : ")
-    print("Region | Casos Confirmados")
+    print("   Region        |           Casos Confirmados")
     if id != "":
         casosRegiones = controllerRegiones.getById(id, connection, DEBUG)
+        while len(casosRegiones.nombre) < 30:
+                casosRegiones.nombre += " "
         print(casosRegiones.nombre,"  ",casosRegiones.casos)
     else:
         casosRegiones = controllerRegiones.getView(connection, DEBUG)
+        # En index 0 están los nombres, en index 1 los casos
         for i in range(len(casosRegiones[0])):
-            while len(casosRegiones[0][i]) < 25:
+            while len(casosRegiones[0][i]) < 30:
                 casosRegiones[0][i] = casosRegiones[0][i] + " "
             print(casosRegiones[0][i],"  ",casosRegiones[1][i])
     return
@@ -78,8 +93,10 @@ def addCasos(connection, DEBUG = False):
     casos = int(input("Casos que desea sumar : "))
     
     casoComuna = controllerComunas.getById(id, connection, DEBUG)
+    if not casoComuna:
+        print("[ERROR] Esa comuna no existe!")
+        return
     nCasos = casoComuna.casos + casos
-    
     casoComuna = [None, None, None, nCasos]
     controllerComunas.patch(id, casoComuna, connection, DEBUG)
     return
@@ -90,8 +107,13 @@ def lessCasos(connection, DEBUG = False):
     casos = int(input("Casos que desea restar : "))
     
     casoComuna = controllerComunas.getById(id, connection, DEBUG)
-    nCasos = casoComuna.casos - casos
-    
+    if not casoComuna:
+        print("[ERROR] Esa comuna no existe!")
+        return
+    if casos > casoComuna.casos:
+        nCasos = 0
+    else:
+        nCasos = casoComuna.casos - casos
     casoComuna = [None, None, None, nCasos]
     controllerComunas.patch(id, casoComuna, connection, DEBUG)
     return
@@ -116,9 +138,9 @@ def checkErase(connection, DEBUG = False):
             for codigo in codigos:
                 if codigo != ",":
                     controllerComunas.delete(codigo, connection, DEBUG)
+        controllerRegiones.delete("ERASE ME", connection, DEBUG)
     else:
-        print("Nada que borrar")
-    controllerRegiones.delete("ERASE ME", connection, DEBUG)
+        print("ERASE CHECK : Nada que purgar")
     return
 
 # Muestra en consola las top 5 positividades de comunas, listTops almacena estos valores
@@ -132,7 +154,7 @@ def checkTopComunas(connection, DEBUG = False):
         listaTops = checkTopAuxiliar(listaTops, [caso.nombre, positividad])
     
     print("Las comunas con TOP contagios son :")
-    print("    Comuna          |    Contagios       ")
+    print("    Comuna          |    Positividad       ")
     for i,j in listaTops:
         while len(i) < 26:
             i = i + " "
@@ -150,7 +172,7 @@ def checkTopRegiones(connection, DEBUG = False):
         listaTops = checkTopAuxiliar(listaTops, [caso.nombre, positividad])
     
     print("Las regiones con TOP contagios son :")
-    print("    Region          |    Contagios       ")
+    print("    Region          |    Positividad       ")
     for i,j in listaTops:
         while len(i) < 26:
             i = i + " "
@@ -189,6 +211,9 @@ def fusionRegiones(connection, DEBUG = False):
     
     region1 = controllerRegiones.getById(region1, connection, DEBUG)
     region2 = controllerRegiones.getById(region2, connection, DEBUG)
+    if not region1 or not region2:
+        print("[ERROR] Uno de los códigos de región no existe!")
+        return
     controllerRegiones.delete(region1.codigo, connection, DEBUG)
     controllerRegiones.delete(region2.codigo, connection, DEBUG)
     
@@ -217,13 +242,16 @@ def fusionRegiones(connection, DEBUG = False):
     controllerRegiones.post(casoRegion, connection, DEBUG)
     return
 
+# Fusión de comunas
 def fusionComunas(connection, DEBUG = False):
     comuna1 = input("Codigo de la comuna 1: ")
     comuna2 = input("Codigo de la comuna 2: ")
     nombre = input("Nombre de la fusión : ")
     comuna1 = controllerComunas.getById(comuna1, connection, DEBUG)
     comuna2 = controllerComunas.getById(comuna2, connection, DEBUG)
-    
+    if not comuna1 or not comuna2:
+        print("[ERROR] Uno de esos códigos de comuna no existe!")
+        return    
 
     regionesPadres = []
     regiones = controllerRegiones.getAll(connection, DEBUG)
